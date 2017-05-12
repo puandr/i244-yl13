@@ -1,6 +1,5 @@
 <?php
 
-
 function connect_db(){
 	global $connection;
 	$host="localhost";
@@ -15,7 +14,30 @@ function connect_db(){
 
 function logi(){
 	// siia on vaja funktsionaalsust (13. nädalal)
-
+	global  $connection;
+	
+	if (!empty($_SESSION["user"])) {
+		header("Location: ?page=loomad");
+	} else {
+		$errors = array();
+		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+			if ($_POST["user"] != "" && $_POST["pass"] != "") {
+				$kasutaja = mysqli_real_escape_string($connection, $_POST["user"]);
+				$parool = mysqli_real_escape_string($connection, $_POST["pass"]);
+				$sql = "SELECT id from 10162828_kylastajad WHERE username = '$kasutaja' AND passw = SHA1('$parool')";
+				$result = mysqli_query($connection, $sql);
+				if (mysqli_num_rows($result)) {
+					$_SESSION["user"] = $_POST["user"];
+					header("Location: ?page=loomad");
+				} else {
+					$errors[] = "Vale kasutajanimi või parool";
+				}
+			} else {
+				$errors[] = "Palun sisestage kasutajanimi ja parool";
+			}
+		}
+	}
+	
 	include_once('views/login.html');
 }
 
