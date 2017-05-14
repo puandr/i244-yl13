@@ -51,34 +51,33 @@ function kuva_puurid(){
 	// siia on vaja funktsionaalsust
 	global $connection;
 	
-	$puurid = array();
-	//$puuri_nr = array();
-	
-	$query = "SELECT DISTINCT puur FROM 10162828_loomaaed";
-	$result = mysqli_query($connection, $query) or die("$query - ".mysqli_error($link));
+	if (!empty($_SESSION["user"])) {
+		$puurid = array();
+		//$puuri_nr = array();
 		
-	//$ridade_arv = mysqli_num_rows($result);
-	
-	while ($ajutine = mysqli_fetch_assoc($result)) {
-	
-		$query_2 = "SELECT * FROM 10162828_loomaaed WHERE puur=".mysqli_real_escape_string($connection, $ajutine['puur']);
-		$result_2 = mysqli_query($connection, $query_2) or die("$query - ".mysqli_error($link_2));
-		//print_r($result_2);
-		//echo "<p>";
-		while ($rida = mysqli_fetch_assoc($result_2)) {
-			$puurid[$ajutine['puur']][] = $rida;
-		}
+		$query = "SELECT DISTINCT puur FROM 10162828_loomaaed";
+		$result = mysqli_query($connection, $query) or die("$query - ".mysqli_error($link));
+			
+		//$ridade_arv = mysqli_num_rows($result);
 		
+		while ($ajutine = mysqli_fetch_assoc($result)) {
 		
-	}
-	
+			$query_2 = "SELECT * FROM 10162828_loomaaed WHERE puur=".mysqli_real_escape_string($connection, $ajutine['puur']);
+			$result_2 = mysqli_query($connection, $query_2) or die("$query - ".mysqli_error($link_2));
+			//print_r($result_2);
+			//echo "<p>";
+			while ($rida = mysqli_fetch_assoc($result_2)) {
+				$puurid[$ajutine['puur']][] = $rida;
+			}			
+		}		
+	} else {
+		header("Location: ?page=login");
+	}	
 	/*
 	echo "<p><pre>";
 	print_r($puurid);
 	echo "</pre>";
 	*/
-		
-
 	include_once('views/puurid.html');
 	
 }
@@ -104,7 +103,6 @@ function lisa(){
 				upload('liik');
 				$nimi = mysqli_real_escape_string($connection, $_POST['nimi']);
 				$puur = mysqli_real_escape_string($connection, $_POST['puur']);
-				//$liik = mysqli_real_escape_string($connection, 'pildid/'.$_FILES['liik']['name']);
 				$liik = mysqli_real_escape_string($connection, substr($_FILES['liik']['name'], 0, -4));
 				$query = "INSERT INTO 10162828_loomaaed(id, nimi, puur, liik) VALUES (NULL, '$nimi', '$puur', '$liik')";
 				$result = mysqli_query($connection, $query);
