@@ -29,6 +29,8 @@ function logi(){
 					$_SESSION['user'] = $_POST['user'];
 					header("Location: ?page=loomad");
 // NB!!				lisada külastuste arvu suurendamist
+					$query3 = "UPDATE 10162828_kylastajad SET visits = visits + 1;";
+					$result3 = mysqli_query($connection, $query3) or die("$query3 - ".mysqli_error($connection));
 				} else {
 					$errors[] = "Vale kasutajanimi või parool";
 				}
@@ -56,14 +58,14 @@ function kuva_puurid(){
 		//$puuri_nr = array();
 		
 		$query = "SELECT DISTINCT puur FROM 10162828_loomaaed";
-		$result = mysqli_query($connection, $query) or die("$query - ".mysqli_error($link));
+		$result = mysqli_query($connection, $query) or die("$query - ".mysqli_error($connection));
 			
 		//$ridade_arv = mysqli_num_rows($result);
 		
 		while ($ajutine = mysqli_fetch_assoc($result)) {
 		
 			$query_2 = "SELECT * FROM 10162828_loomaaed WHERE puur=".mysqli_real_escape_string($connection, $ajutine['puur']);
-			$result_2 = mysqli_query($connection, $query_2) or die("$query - ".mysqli_error($link_2));
+			$result_2 = mysqli_query($connection, $query_2) or die("$query - ".mysqli_error($connection));
 			//print_r($result_2);
 			//echo "<p>";
 			while ($rida = mysqli_fetch_assoc($result_2)) {
