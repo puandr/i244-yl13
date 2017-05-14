@@ -16,19 +16,19 @@ function logi(){
 	// siia on vaja funktsionaalsust (13. nädalal)
 	global  $connection;
 	
-	if (!empty($_SESSION["user"])) {
+	if (!empty($_SESSION['user'])) {
 		header("Location: ?page=loomad");
-	} else {
-		$errors = array();
+	} else {		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-			if ($_POST["user"] != "" && $_POST["pass"] != "") {
-				$kasutaja = mysqli_real_escape_string($connection, $_POST["user"]);
-				$parool = mysqli_real_escape_string($connection, $_POST["pass"]);
-				$sql = "SELECT id from 10162828_kylastajad WHERE username = '$kasutaja' AND passw = SHA1('$parool')";
-				$result = mysqli_query($connection, $sql);
+			if ($_POST['user'] != "" && $_POST['pass'] != "") {
+				$kasutaja = mysqli_real_escape_string($connection, $_POST['user']);
+				$parool = mysqli_real_escape_string($connection, $_POST['pass']);
+				$query = "SELECT id FROM 10162828_kylastajad WHERE username = '$kasutaja' AND passw = SHA1('$parool')";
+				$result = mysqli_query($connection, $query);
 				if (mysqli_num_rows($result)) {
-					$_SESSION["user"] = $_POST["user"];
+					$_SESSION['user'] = $_POST['user'];
 					header("Location: ?page=loomad");
+// NB!!				lisada külastuste arvu suurendamist
 				} else {
 					$errors[] = "Vale kasutajanimi või parool";
 				}
@@ -83,12 +83,46 @@ function kuva_puurid(){
 	
 }
 
+
 function lisa(){
 	// siia on vaja funktsionaalsust (13. nädalal)
 	
+	global $connection;
+	
+	if (empty($_SESSION['user'])) {
+		header("Location: ?page=login");
+	} else {
+		//echo "<p>";
+		//print_r($_SERVER['REQUEST_METHOD']);
+		//echo "</p>";
+		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+			if ($_POST['nimi'] == "" || $_POST['puur'] == "") {
+				$errors[] = "Nimi või puur on sisestamata";
+			} elseif (upload("liik") == ""){
+				$errors[] = "Faili saatmine nurjus";
+			} else {
+				upload('liik');
+				$nimi = mysqli_real_escape_string($connection, $_POST['nimi']);
+				$puur = mysqli_real_escape_string($connection, $_POST['puur']);
+				//$liik = mysqli_real_escape_string($connection, 'pildid/'.$_FILES['liik']['name']);
+				$liik = mysqli_real_escape_string($connection, substr($_FILES['liik']['name'], 0, -4));
+				$query = "INSERT INTO 10162828_loomaaed(id, nimi, puur, liik) VALUES (NULL, '$nimi', '$puur', '$liik')";
+				$result = mysqli_query($connection, $query);
+				
+				if (mysqli_insert_id($connection)) {
+					header("Location: ?page=loomad");
+				} else {
+					header("Location: ?page=loomavorm");
+				}
+			}
+		}
+		
+		
+	}
 	include_once('views/loomavorm.html');
 	
 }
+
 
 function upload($name){
 	$allowedExts = array("jpg", "jpeg", "gif", "png");
